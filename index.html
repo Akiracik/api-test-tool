@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="tr" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akira API Tester</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-braces-asterisk"></i> Akira API Tester
+            </a>
+            <div class="theme-switcher ms-auto d-flex align-items-center">
+                <span class="theme-icon light-icon"><i class="bi bi-sun-fill"></i></span>
+                <div class="form-check form-switch mx-2">
+                    <input class="form-check-input" type="checkbox" id="themeSwitch">
+                </div>
+                <span class="theme-icon dark-icon"><i class="bi bi-moon-stars-fill"></i></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <div class="row">
+            <div class="col-lg-8 col-md-12">
+                <div class="card request-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-send"></i> API İsteği</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="apiForm">
+                            <div class="row mb-3">
+                                <div class="col-md-8 col-sm-12 mb-md-0 mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                        <input type="url" class="form-control" id="apiUrl" placeholder="https://api.example.com/endpoint" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-12">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-arrow-down-up"></i></span>
+                                        <select class="form-select" id="method">
+                                            <option value="GET">GET</option>
+                                            <option value="POST">POST</option>
+                                            <option value="PUT">PUT</option>
+                                            <option value="DELETE">DELETE</option>
+                                            <option value="PATCH">PATCH</option>
+                                            <option value="HEAD">HEAD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0"><i class="bi bi-card-heading"></i> Headers</label>
+                                    <button type="button" class="btn btn-sm btn-primary" id="addHeader">
+                                        <i class="bi bi-plus"></i> Header Ekle
+                                    </button>
+                                </div>
+                                <div id="headers-container" class="headers-wrapper">
+                                    <!-- Header rows will be added here -->
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="requestBody" class="form-label"><i class="bi bi-body-text"></i> Request Body (JSON)</label>
+                                <div class="code-editor-wrapper">
+                                    <textarea class="form-control code-editor" id="requestBody" rows="7" placeholder='{ "key": "value" }'></textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-submit">
+                                    <i class="bi bi-lightning-charge"></i> API'yi Test Et
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="loading" class="text-center mt-4 d-none">
+                            <div class="spinner"></div>
+                            <p class="mt-2">İstek gönderiliyor...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="result" class="card response-card d-none">
+                    <div class="card-header">
+                        <h5><i class="bi bi-reply"></i> API Yanıtı</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row status-indicators">
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                <div class="status-card" id="statusCard">
+                                    <div class="status-icon">
+                                        <i class="bi bi-check-circle"></i>
+                                    </div>
+                                    <div class="status-details">
+                                        <h6>Durum Kodu</h6>
+                                        <div id="statusCode" class="status-value">200</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                <div class="status-card">
+                                    <div class="status-icon">
+                                        <i class="bi bi-clock"></i>
+                                    </div>
+                                    <div class="status-details">
+                                        <h6>Yanıt Süresi</h6>
+                                        <div id="responseTime" class="status-value">120 ms</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                <div class="status-card">
+                                    <div class="status-icon">
+                                        <i class="bi bi-file-earmark-code"></i>
+                                    </div>
+                                    <div class="status-details">
+                                        <h6>İçerik Tipi</h6>
+                                        <div id="contentType" class="status-value">application/json</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <ul class="nav nav-tabs" id="responseTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="response-body-tab" data-bs-toggle="tab" data-bs-target="#response-body" type="button" role="tab">
+                                        <i class="bi bi-body-text"></i> Response Body
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="response-headers-tab" data-bs-toggle="tab" data-bs-target="#response-headers" type="button" role="tab">
+                                        <i class="bi bi-card-heading"></i> Response Headers
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content mt-2" id="responseTabContent">
+                                <div class="tab-pane fade show active" id="response-body" role="tabpanel">
+                                    <div class="code-block">
+                                        <div class="code-block-header">
+                                            <span>Response Body</span>
+                                            <button class="btn btn-sm btn-copy" data-target="responseBody">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                        </div>
+                                        <pre id="responseBody"></pre>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="response-headers" role="tabpanel">
+                                    <div class="code-block">
+                                        <div class="code-block-header">
+                                            <span>Response Headers</span>
+                                            <button class="btn btn-sm btn-copy" data-target="responseHeaders">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                        </div>
+                                        <pre id="responseHeaders"></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="errorMessage" class="alert alert-custom alert-danger d-none mt-3">
+                    <div class="alert-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h5>Hata!</h5>
+                        <div id="errorText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-12">
+                <div class="card history-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-clock-history"></i> Kaydedilen İstekler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="savedRequests" class="saved-requests">
+                            <!-- Kaydedilen istekler burada görüntülenecek -->
+                        </div>
+                        <div class="text-center mt-3" id="noSavedRequests">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p>Kaydedilmiş istek bulunamadı.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-md-start text-center mb-md-0 mb-3">
+                    <span class="copyright">© 2025 Akira API Tester - Tüm Hakları Saklıdır</span>
+                </div>
+                <div class="col-md-6 text-md-end text-center">
+                    <span class="made-with">Made with <span class="heart">❤️</span> by Akira</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
