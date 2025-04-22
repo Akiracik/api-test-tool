@@ -31,5 +31,5 @@ Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 
 ## İletişim & Demo
 
-[Demo](https://akira-api-test.vercell.app)
+[Demo](https://akira-api-test.vercel.app/)
 Sorularınız veya önerileriniz için [discord](https://discord.com/users/337545269845688361) adresinden bana ulaşabilirsiniz.
